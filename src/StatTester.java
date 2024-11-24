@@ -1,308 +1,410 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StatTester extends JFrame {
-    private List<Double> baseStats = new ArrayList<>();
-    private List<Double> calculatedStats = new ArrayList<>();
-    private List<String> phaseRates = new ArrayList<>();
-    private List<JTextField> baseStatFields = new ArrayList<>();
-    private List<JTextField> statFields = new ArrayList<JTextField>();
-    private List<JComboBox<String>> statGrowthComboboxes = new ArrayList<JComboBox<String>>();
+    private List<Double> baseStats = new ArrayList<>(); // Base Stats (HP, ATTACK, DEFENSE, SPECIAL, SPEED)
+    private List<Double> baseGrowths = new ArrayList<>(); // Base Growths corresponding to each stat
+    private List<Double> calculatedStats = new ArrayList<>(); // Calculated stats after applying growth rates
+    private List<String> phaseRates = new ArrayList<>(); // Selected growth rates for each phase
+
+    // Input fields for base stats and base growths
+    private List<JTextField> baseStatInputFields = new ArrayList<>();
+    private List<JTextField> baseGrowthInputFields = new ArrayList<>();
+    
+    // Display fields for calculated stats
+    private List<JTextField> statFields = new ArrayList<>();
+    
+    // ComboBoxes for selecting growth rates for each phase
+    private List<JComboBox<String>> statGrowthComboboxes = new ArrayList<>();
+
+    // ComboBox for selecting the XP Rate
+    private JComboBox<String> xpGrowthComboBox;
+
     public StatTester() {
         super("Stat Tester");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridBagLayout()); // Use GridBagLayout for the main frame
+        setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding around components
 
+        /* -------------------------------------------------------------------------------------------------*/
 
+        // Input Panel Setup
+        JPanel inputPanel = new JPanel(new GridLayout(6, 6, 5, 5));
+        inputPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 2), "Stat Inputs"));
 
-        // Top input panel
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridLayout(6, 5));
-        inputPanel.setBorder(BorderFactory.createLineBorder(Color.black,2));
+        // Row 1 - Headers
+        inputPanel.add(new JLabel()); // Empty for alignment
+        inputPanel.add(createHeaderLabel("Base Stat"));
+        inputPanel.add(createHeaderLabel("Base Growth"));
+        inputPanel.add(createHeaderLabel("Phases"));
+        inputPanel.add(createHeaderLabel("Growth Rate"));
+        inputPanel.add(new JLabel()); // Empty for alignment
 
+        // Define growth rate options
+        String[] growthOptions = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
 
-        // Row 1
-        JLabel b1 = new JLabel();
-        inputPanel.add(b1);
-        JLabel baseGrowth = new JLabel("Base growth");
-        baseGrowth.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(baseGrowth);
-        JLabel phases = new JLabel("Phases");
-        phases.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(phases);
-        JLabel statGrowthrate = new JLabel("Growth rate");
-        statGrowthrate.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(statGrowthrate);
-        JLabel xpRate = new JLabel("XP Rate");
-        xpRate.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(xpRate);
+        // Row 2 - HP
+        inputPanel.add(createStatLabel("HP"));
+        JTextField hpBaseStat = createTextField("100"); // Example initial value
+        inputPanel.add(hpBaseStat);
+        baseStatInputFields.add(hpBaseStat);
 
-        // Row 2
-        JLabel hp = new JLabel("HP");
-        hp.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(hp);
-        JTextField hpStat = new JTextField("0");
-        inputPanel.add(hpStat);
-        baseStatFields.add(hpStat);
-        JLabel phase1 = new JLabel("Phase 1");
-        phase1.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(phase1);
+        JTextField hpBaseGrowth = createTextField("10"); // Example initial value
+        inputPanel.add(hpBaseGrowth);
+        baseGrowthInputFields.add(hpBaseGrowth);
 
-        // Phases ComboBox
-        String[] p1Option = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
-        JComboBox<String> phase1Combo = new JComboBox<>(p1Option);
+        inputPanel.add(createPhaseLabel("Phase 1"));
+        JComboBox<String> phase1Combo = createComboBox(growthOptions, "Neutral");
         inputPanel.add(phase1Combo);
         statGrowthComboboxes.add(phase1Combo);
 
-        // Stat growth Combobox
-        String[] xpOptions = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
-        JComboBox<String> xpGrowthComboBox = new JComboBox<>(xpOptions);
-        inputPanel.add(xpGrowthComboBox);
+        inputPanel.add(new JLabel()); // Empty for alignment
 
-        // Row 3
-        JLabel attack = new JLabel("ATTACK");
-        attack.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(attack);
-        JTextField attackStat = new JTextField("0");
-        inputPanel.add(attackStat);
-        baseStatFields.add(attackStat);
-        JLabel phase2 = new JLabel("Phase 2");
-        phase2.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(phase2);
+        // Row 3 - ATTACK
+        inputPanel.add(createStatLabel("ATTACK"));
+        JTextField attackBaseStat = createTextField("100"); // Example initial value
+        inputPanel.add(attackBaseStat);
+        baseStatInputFields.add(attackBaseStat);
 
-        // Phases ComboBox
-        String[] p2Option = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
-        JComboBox<String> phase2Combo = new JComboBox<>(p2Option);
+        JTextField attackBaseGrowth = createTextField("10"); // Example initial value
+        inputPanel.add(attackBaseGrowth);
+        baseGrowthInputFields.add(attackBaseGrowth);
+
+        inputPanel.add(createPhaseLabel("Phase 2"));
+        JComboBox<String> phase2Combo = createComboBox(growthOptions, "Neutral");
         inputPanel.add(phase2Combo);
         statGrowthComboboxes.add(phase2Combo);
-        JLabel b2 = new JLabel();
-        inputPanel.add(b2);
 
-        // Row 4
-        JLabel defense = new JLabel("DEFENSE");
-        defense.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(defense);
-        JTextField defenseStat = new JTextField("0");
-        inputPanel.add(defenseStat);
-        baseStatFields.add(defenseStat);
-        JLabel phase3 = new JLabel("Phase 3");
-        phase3.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(phase3);
+        inputPanel.add(new JLabel()); // Empty for alignment
 
-        // Phases ComboBox
-        String[] p3Option = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
-        JComboBox<String> phase3Combo = new JComboBox<>(p3Option);
+        // Row 4 - DEFENSE
+        inputPanel.add(createStatLabel("DEFENSE"));
+        JTextField defenseBaseStat = createTextField("100"); // Example initial value
+        inputPanel.add(defenseBaseStat);
+        baseStatInputFields.add(defenseBaseStat);
+
+        JTextField defenseBaseGrowth = createTextField("10"); // Example initial value
+        inputPanel.add(defenseBaseGrowth);
+        baseGrowthInputFields.add(defenseBaseGrowth);
+
+        inputPanel.add(createPhaseLabel("Phase 3"));
+        JComboBox<String> phase3Combo = createComboBox(growthOptions, "Neutral");
         inputPanel.add(phase3Combo);
         statGrowthComboboxes.add(phase3Combo);
-        JLabel b3 = new JLabel();
-        inputPanel.add(b3);
 
-        // Row 5
-        JLabel special = new JLabel("SPECIAL");
-        special.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(special);
-        JTextField specialStat = new JTextField("0");
-        inputPanel.add(specialStat);
-        baseStatFields.add(specialStat);
-        JLabel phase4 = new JLabel("Phase 4");
-        phase4.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(phase4);
+        inputPanel.add(new JLabel()); // Empty for alignment
 
-        // Phases ComboBox
-        String[] p4Option = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
-        JComboBox<String> phase4Combo = new JComboBox<>(p4Option);
+        // Row 5 - SPECIAL
+        inputPanel.add(createStatLabel("SPECIAL"));
+        JTextField specialBaseStat = createTextField("100"); // Example initial value
+        inputPanel.add(specialBaseStat);
+        baseStatInputFields.add(specialBaseStat);
+
+        JTextField specialBaseGrowth = createTextField("10"); // Example initial value
+        inputPanel.add(specialBaseGrowth);
+        baseGrowthInputFields.add(specialBaseGrowth);
+
+        inputPanel.add(createPhaseLabel("Phase 4"));
+        JComboBox<String> phase4Combo = createComboBox(growthOptions, "Neutral");
         inputPanel.add(phase4Combo);
         statGrowthComboboxes.add(phase4Combo);
-        JLabel b4 = new JLabel();
-        inputPanel.add(b4);
 
-        // Row 6
-        JLabel speed = new JLabel("SPEED");
-        speed.setHorizontalAlignment(JLabel.CENTER);
-        inputPanel.add(speed);
-        JTextField speedStat = new JTextField("0");
-        inputPanel.add(speedStat);
-        baseStatFields.add(speedStat);
-        JLabel b5 = new JLabel();
-        inputPanel.add(b5);
-        JLabel b6 = new JLabel();
-        inputPanel.add(b6);
+        inputPanel.add(new JLabel()); // Empty for alignment
+
+        // Row 6 - SPEED
+        inputPanel.add(createStatLabel("SPEED"));
+        JTextField speedBaseStat = createTextField("100"); // Example initial value
+        inputPanel.add(speedBaseStat);
+        baseStatInputFields.add(speedBaseStat);
+
+        JTextField speedBaseGrowth = createTextField("10"); // Example initial value
+        inputPanel.add(speedBaseGrowth);
+        baseGrowthInputFields.add(speedBaseGrowth);
+
+        inputPanel.add(new JLabel()); // Empty label replacing Phase 4 label for SPEED
+        inputPanel.add(new JLabel()); // Empty label replacing Phase 4 ComboBox for SPEED
+
+        /* -------------------------------------------------------------------------------------------------*/
+
+        // Button Panel with Calculate Button
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton calculate = new JButton("Calculate");
-        calculate.setHorizontalAlignment(JLabel.CENTER);
+        calculate.setPreferredSize(new Dimension(100, 30));
+        buttonPanel.add(calculate);
 
-        /*
-        *
-        * submit button
-        *
-        * */
+        // ActionListener for Calculate Button
         calculate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setBaseStats();
-                setPhaseRates();
-                CalculateStats.calculate(baseStats, phaseRates);
+                performCalculation();
             }
         });
-        inputPanel.add(calculate);
 
-
-        // Add the input panel to the NORTH section
+        // Add Input Panel to Frame
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1;
-        gbc.weighty = 0.5; // Allocate space for the top panel
+        gbc.weighty = 0.6; // Allocate more space for input panel
         gbc.fill = GridBagConstraints.BOTH;
         add(inputPanel, gbc);
 
-/* -------------------------------------------------------------------------------------------------*/
+        /* -------------------------------------------------------------------------------------------------*/
 
-        // Bottom display panel
-        JPanel displayPanel = new JPanel();
-        displayPanel.setLayout(new GridLayout(6, 6));
-        //Row 1
-        JLabel level = new JLabel("Level");
-        level.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level);
-        JLabel level1 = new JLabel("1");
-        level1.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level1);
-        JLabel level30 = new JLabel("30");
-        level30.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level30);
-        JLabel level70 = new JLabel("70");
-        level70.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level70);
-        JLabel level110 = new JLabel("110");
-        level110.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level110);
-        JLabel level150 = new JLabel("150");
-        level150.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(level150);
-        //Row 2
-        JLabel hpModLabel = new JLabel("HP");
-        hpModLabel.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(hpModLabel);
-        JTextField hp1 = new JTextField("0");
-        displayPanel.add(hp1);
-        statFields.add(hp1);
-        JTextField hp40 = new JTextField("0");
-        displayPanel.add(hp40);
-        statFields.add(hp40);
-        JTextField hp80 = new JTextField("0");
-        displayPanel.add(hp80);
-        statFields.add(hp80);
-        JTextField hp120 = new JTextField("0");
-        displayPanel.add(hp120);
-        statFields.add(hp120);
-        JTextField hp150 = new JTextField("0");
-        displayPanel.add(hp150);
-        statFields.add(hp150);
-        //Row 3
-        JLabel attackModLabel = new JLabel("ATTACK");
-        attackModLabel.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(attackModLabel);
-        JTextField attack1 = new JTextField("0");
-        displayPanel.add(attack1);
-        statFields.add(attack1);
-        JTextField attack40 = new JTextField("0");
-        displayPanel.add(attack40);
-        statFields.add(attack40);
-        JTextField attack80 = new JTextField("0");
-        displayPanel.add(attack80);
-        statFields.add(attack80);
-        JTextField attack120 = new JTextField("0");
-        displayPanel.add(attack120);
-        statFields.add(attack120);
-        JTextField attack150 = new JTextField("0");
-        displayPanel.add(attack150);
-        statFields.add(attack150);
-        //Row 4
-        JLabel defenseModLabel = new JLabel("DEFENSE");
-        defenseModLabel.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(defenseModLabel);
-        JTextField defense1 = new JTextField("0");
-        displayPanel.add(defense1);
-        statFields.add(defense1);
-        JTextField defense40 = new JTextField("0");
-        displayPanel.add(defense40);
-        statFields.add(defense40);
-        JTextField defense80 = new JTextField("0");
-        displayPanel.add(defense80);
-        statFields.add(defense80);
-        JTextField defense120 = new JTextField("0");
-        displayPanel.add(defense120);
-        statFields.add(defense120);
-        JTextField defense150 = new JTextField("0");
-        displayPanel.add(defense150);
-        statFields.add(defense150);
-        //Row 5
-        JLabel specialModLabel = new JLabel("SPECIAL");
-        specialModLabel.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(specialModLabel);
-        JTextField special1 = new JTextField("0");
-        displayPanel.add(special1);
-        statFields.add(special1);
-        JTextField special40 = new JTextField("0");
-        displayPanel.add(special40);
-        statFields.add(special40);
-        JTextField special80 = new JTextField("0");
-        displayPanel.add(special80);
-        statFields.add(special80);
-        JTextField special120 = new JTextField("0");
-        displayPanel.add(special120);
-        statFields.add(special120);
-        JTextField special150 = new JTextField("0");
-        displayPanel.add(special150);
-        statFields.add(special150);
-        //Row 6
-        JLabel speedModLabel = new JLabel("SPEED");
-        speedModLabel.setHorizontalAlignment(JLabel.CENTER);
-        displayPanel.add(speedModLabel);
-        JTextField speed1 = new JTextField("0");
-        displayPanel.add(speed1);
-        statFields.add(speed1);
-        JTextField speed40 = new JTextField("0");
-        displayPanel.add(speed40);
-        statFields.add(speed40);
-        JTextField speed80 = new JTextField("0");
-        displayPanel.add(speed80);
-        statFields.add(speed80);
-        JTextField speed120 = new JTextField("0");
-        displayPanel.add(speed120);
-        statFields.add(speed120);
-        JTextField speed150 = new JTextField("0");
-        displayPanel.add(speed150);
-        statFields.add(speed150);
+        // XP Rate Panel
+        JPanel xpRatePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        xpRatePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 2), "XP Rate"));
 
+        JLabel xpRateLabel = new JLabel("XP Rate:");
+        xpRatePanel.add(xpRateLabel);
 
-        // Add the display panel to the SOUTH section
+        String[] xpOptions = {"Very slow", "Slow", "Neutral", "Fast", "Very fast"};
+        xpGrowthComboBox = new JComboBox<>(xpOptions);
+        xpGrowthComboBox.setSelectedItem("Neutral");
+        xpRatePanel.add(xpGrowthComboBox);
+
+        // Add XP Rate Panel to Frame
         gbc.gridy = 1;
-        gbc.weighty = 0.5; // Allocate space for the bottom panel
+        gbc.weighty = 0.1; // Allocate space for XP Rate panel
+        add(xpRatePanel, gbc);
+
+        /* -------------------------------------------------------------------------------------------------*/
+
+        // Add Button Panel to Frame
+        gbc.gridy = 2;
+        gbc.weighty = 0.1; // Allocate space for button panel
+        add(buttonPanel, gbc);
+
+        /* -------------------------------------------------------------------------------------------------*/
+
+        // Display Panel for Calculated Stats
+        JPanel displayPanel = new JPanel(new GridLayout(6, 6, 5, 5));
+        displayPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 2), "Calculated Stats"));
+
+        // Row 1 - Level Headers
+        displayPanel.add(createHeaderLabel("Level"));
+        displayPanel.add(createHeaderLabel("1"));
+        displayPanel.add(createHeaderLabel("30"));
+        displayPanel.add(createHeaderLabel("70"));
+        displayPanel.add(createHeaderLabel("110"));
+        displayPanel.add(createHeaderLabel("150")); // Reintroduced Level 150
+
+        // Rows 2-6 - Stats (HP, ATTACK, DEFENSE, SPECIAL, SPEED)
+        String[] stats = {"HP", "ATTACK", "DEFENSE", "SPECIAL", "SPEED"};
+        for (String stat : stats) {
+            displayPanel.add(createStatLabel(stat));
+
+            // Add JTextFields for each level
+            for (int i = 0; i < 5; i++) { // 5 test levels
+                JTextField field = new JTextField("0");
+                field.setEditable(false);
+                field.setHorizontalAlignment(JTextField.CENTER);
+                displayPanel.add(field);
+                statFields.add(field);
+            }
+        }
+
+        // Add Display Panel to Frame
+        gbc.gridy = 3;
+        gbc.weighty = 0.3; // Allocate space for the display panel
         add(displayPanel, gbc);
 
-        // Finalize frame setup
-        setSize(550, 300);
+        /* -------------------------------------------------------------------------------------------------*/
+
+        // Finalize Frame
+        pack();
+        setLocationRelativeTo(null); // Center the frame on the screen
         setVisible(true);
+
+        // Attach ItemListeners to ComboBoxes for automatic recalculations
+        addPhaseComboBoxListeners();
     }
 
+    /**
+     * Creates a header JLabel with centered text.
+     */
+    private JLabel createHeaderLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        return label;
+    }
+
+    /**
+     * Creates a stat JLabel with centered text.
+     */
+    private JLabel createStatLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        return label;
+    }
+
+    /**
+     * Creates a phase JLabel with centered text.
+     */
+    private JLabel createPhaseLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        return label;
+    }
+
+    /**
+     * Creates a JTextField with specified initial text.
+     */
+    private JTextField createTextField(String initialText) {
+        JTextField textField = new JTextField(initialText);
+        textField.setHorizontalAlignment(JTextField.CENTER);
+        return textField;
+    }
+
+    /**
+     * Creates a JComboBox with specified options and sets the default selected item.
+     */
+    private JComboBox<String> createComboBox(String[] options, String defaultSelection) {
+        JComboBox<String> comboBox = new JComboBox<>(options);
+        comboBox.setSelectedItem(defaultSelection);
+        return comboBox;
+    }
+
+    /**
+     * Adds ItemListeners to all phase ComboBoxes and the XP Rate ComboBox to trigger recalculations
+     * whenever a selection changes.
+     */
+    private void addPhaseComboBoxListeners() {
+        // Add listeners to all phase ComboBoxes
+        for (JComboBox<String> comboBox : statGrowthComboboxes) {
+            comboBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    // Only respond to selection events, not deselection
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        performCalculation(); // Automatically perform calculation on selection change
+                    }
+                }
+            });
+        }
+
+        // Add listener to the XP Rate ComboBox as well
+        xpGrowthComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                // Only respond to selection events, not deselection
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    performCalculation(); // Automatically perform calculation on XP Rate change
+                }
+            }
+        });
+    }
+
+    /**
+     * Encapsulates the calculation and display update logic.
+     */
+    private void performCalculation() {
+        clearStatFields(); // Reset display fields
+        setBaseStats(); // Retrieve base stats from input fields
+        setBaseGrowths(); // Retrieve base growths from input fields
+        String xpRate = getXPRate(); // Get selected XP Rate
+        setPhaseRates(); // Retrieve selected phase growth rates
+        calculatedStats = CalculateStats.calculate(baseStats, baseGrowths, phaseRates, xpRate); // Perform calculations
+        fillStatsTable(calculatedStats); // Update display fields with calculated stats
+    }
+
+    /**
+     * Retrieves and sets the base stats from the input fields.
+     */
+    private void setBaseStats() {
+        baseStats.clear();
+        try {
+            for (JTextField field : baseStatInputFields) {
+                double value = Double.parseDouble(field.getText());
+                if (value < 0) throw new NumberFormatException("Negative value");
+                baseStats.add(value);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid non-negative numeric values for base stats.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Retrieves and sets the base growths from the input fields.
+     */
+    private void setBaseGrowths() {
+        baseGrowths.clear();
+        try {
+            for (JTextField field : baseGrowthInputFields) {
+                double value = Double.parseDouble(field.getText());
+                if (value < 0) throw new NumberFormatException("Negative value");
+                baseGrowths.add(value);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid non-negative numeric values for base growths.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Retrieves and sets the phase growth rates from the ComboBoxes.
+     */
     private void setPhaseRates() {
-        for(JComboBox<String> phase : statGrowthComboboxes){
-            //can not be null
+        phaseRates.clear();
+        for (JComboBox<String> phase : statGrowthComboboxes) {
             phaseRates.add(phase.getSelectedItem().toString());
         }
     }
 
-    private void setBaseStats() {
-        for(JTextField field : baseStatFields){
-            baseStats.add(Double.parseDouble(field.getText()));
+    /**
+     * Retrieves the selected XP Rate.
+     *
+     * @return The selected XP Rate as a String.
+     */
+    private String getXPRate() {
+        return (String) xpGrowthComboBox.getSelectedItem();
+    }
+
+    /**
+     * Populates the display table with the calculated stats.
+     *
+     * @param stats The list of calculated stats.
+     */
+    private void fillStatsTable(List<Double> stats) {
+        if (stats.size() != statFields.size()) {
+            JOptionPane.showMessageDialog(this, "Mismatch between calculated stats and display fields.", "Calculation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int numLevels = 5; // Levels: 1, 30, 70, 110, 150
+        int numStats = 5; // HP, ATTACK, DEFENSE, SPECIAL, SPEED
+
+        // The statFields list is ordered by stat first, then by level.
+        // Iterate through each stat and then each level.
+        for (int statIndex = 0; statIndex < numStats; statIndex++) {
+            for (int levelIndex = 0; levelIndex < numLevels; levelIndex++) {
+                int dataIndex = (statIndex * numLevels) + levelIndex;
+                int fieldIndex = (statIndex * numLevels) + levelIndex;
+
+                double statValue = stats.get(dataIndex);
+                int intStatValue = (int) Math.round(statValue); // Round to nearest integer
+                String formattedValue = String.valueOf(intStatValue); // Convert to String without decimals
+                statFields.get(fieldIndex).setText(formattedValue);
+            }
+        }
+    }
+
+    /**
+     * Clears all the display fields by resetting them to "0".
+     */
+    private void clearStatFields() {
+        for (JTextField field : statFields) {
+            field.setText("0");
         }
     }
 
     public static void main(String[] args) {
-        new StatTester();
+        // Ensure the GUI is created on the Event Dispatch Thread
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new StatTester();
+            }
+        });
     }
 }
