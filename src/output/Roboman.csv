@@ -1,0 +1,36 @@
+Base Stats:
+HP,115.0
+Attack,60.0
+Armor,40.0
+Shield,20.0
+Special,40.0
+Speed,45.0
+
+Base Growths:
+HP,7.0
+Attack,5.0
+Armor,3.5
+Shield,1.5
+Special,3.0
+Speed,3.0
+
+Phase Growth Rates:
+Phase 1,Slow
+Phase 2,Neutral
+Phase 3,Neutral
+Phase 4,Neutral
+
+XP Curve:
+NEUTRAL
+
+Calculated Stats:
+Stat,Level 1,Level 30,Level 70,Level 110,Level 150
+HP,115,271,547,827,1107
+Attack,60,171,369,569,769
+Armor,40,118,256,396,536
+Shield,20,53,113,173,233
+Special,40,107,225,345,465
+Speed,45,112,230,350,470
+BST,320,832,1740,2660,3580
+XP to Next Level,54,12391,48068,99066,162720
+Cumulative XP,54,149217,1318254,4240905,9469225
